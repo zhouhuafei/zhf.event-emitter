@@ -27,7 +27,8 @@ class Super {
             const obj = this.event[str];
             if (obj) {
                 if (num && num >= 1) {
-                    obj.splice((num - 1), 1);
+                    obj.splice((num - 1), 1, function () {
+                    });
                 } else {
                     obj.length = 0;
                 }
