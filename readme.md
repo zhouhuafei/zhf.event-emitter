@@ -42,6 +42,9 @@ event.emit('dog', dogData);
 // 取消dog的全部订阅
 event.off('dog');
 
+// dog的发布
+event.emit('dog', dogData);
+
 // 取消dog和cat以及pig的全部订阅
 event.off();
 
