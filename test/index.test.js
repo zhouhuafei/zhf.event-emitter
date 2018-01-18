@@ -60,6 +60,14 @@ test('订阅发布测试', () => {
         result.push(['pig的单次订阅2', data]);
     });
 
+    // pig的单次订阅3
+    event.one('pig', (data) => {
+        result.push(['pig的单次订阅3', data]);
+    });
+
+    // 取消pig的第2次单次订阅
+    event.off('pig', 2);
+
     // pig的发布
     event.emit('pig', pigData);
 
@@ -74,6 +82,6 @@ test('订阅发布测试', () => {
         ['dog的第1次订阅', {name: 'dog'}],
         ['dog的第3次订阅', {name: 'dog'}],
         ['pig的单次订阅1', {name: 'pig'}],
-        ['pig的单次订阅2', {name: 'pig'}],
+        ['pig的单次订阅3', {name: 'pig'}],
     ]);
 });
