@@ -46,6 +46,7 @@ class Super {
                     json.fn(data);
                 }
                 if (Object.prototype.toString.call(cb).slice(8, -1).toLowerCase() === 'function') {
+                    json.data = data;
                     cb(json);
                 }
             });

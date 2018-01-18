@@ -83,12 +83,12 @@ event.on('minNum', (data) => {
 
 // minNum的第1次发布 - 订阅者(on)收不到消息
 event.emit('minNum', {name: 'minNum'}, function (data) {
-    console.log(data); // { triggerNum: 1, minNum: 2 }
+    console.log(data); // {minNum: 2, triggerNum: 1, fn: [Function], data: {name: 'minNum'}}
 });
 
 // minNum的第2次发布 - 订阅者(on)能收到消息
 event.emit('minNum', {name: 'minNum'}, function (data) {
-    console.log(data); // { triggerNum: 2, minNum: 2 }
+    console.log(data); // {minNum: 2, triggerNum: 2, fn: [Function], data: {name: 'minNum'}}
 });
 
 // result
