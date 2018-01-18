@@ -3,6 +3,7 @@ const event = require('../dist/index.min');
 test('订阅发布测试', () => {
     const dogData = {name: 'dog'};
     const catData = {name: 'cat'};
+    const pigData = {name: 'pig'};
     const result = [];
 
     // cat的第1次订阅
@@ -40,7 +41,7 @@ test('订阅发布测试', () => {
     // 取消dog的全部订阅
     event.off('dog');
 
-    // 取消dog和cat全部订阅
+    // 取消dog和cat以及pig的全部订阅
     event.off();
 
     // dog的发布
@@ -49,6 +50,17 @@ test('订阅发布测试', () => {
     // cat的发布
     event.emit('cat', catData);
 
+    // pig的单次订阅
+    event.one('pig', (data) => {
+        result.push(['pig的单次订阅', data]);
+    });
+
+    // pig的发布
+    event.emit('pig', pigData);
+
+    // pig的发布
+    event.emit('pig', pigData);
+
     expect(result).toEqual([
         ['dog的第1次订阅', {name: 'dog'}],
         ['dog的第2次订阅', {name: 'dog'}],
@@ -56,5 +68,6 @@ test('订阅发布测试', () => {
         ['cat的第1次订阅', {name: 'cat'}],
         ['dog的第1次订阅', {name: 'dog'}],
         ['dog的第3次订阅', {name: 'dog'}],
+        ['pig的单次订阅', {name: 'pig'}],
     ]);
 });

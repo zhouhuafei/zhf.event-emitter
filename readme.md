@@ -4,6 +4,7 @@ const event = require('zhf.event');
 
 const dogData = {name: 'dog'};
 const catData = {name: 'cat'};
+const pigData = {name: 'pig'};
 const result = [];
 
 // cat的第1次订阅
@@ -41,7 +42,7 @@ event.emit('dog', dogData);
 // 取消dog的全部订阅
 event.off('dog');
 
-// 取消dog和cat全部订阅
+// 取消dog和cat以及pig的全部订阅
 event.off();
 
 // dog的发布
@@ -49,6 +50,17 @@ event.emit('dog', dogData);
 
 // cat的发布
 event.emit('cat', catData);
+
+// pig的单次订阅
+event.one('pig', (data) => {
+    result.push(['pig的单次订阅', data]);
+});
+
+// pig的发布
+event.emit('pig', pigData);
+
+// pig的发布
+event.emit('pig', pigData);
 
 // result
 /*
@@ -59,6 +71,7 @@ event.emit('cat', catData);
     ['cat的第1次订阅', {name: 'cat'}],
     ['dog的第1次订阅', {name: 'dog'}],
     ['dog的第3次订阅', {name: 'dog'}],
+    ['pig的单次订阅', {name: 'pig'}],
 ]
 */
 ```

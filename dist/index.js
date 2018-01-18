@@ -9,6 +9,7 @@ var Super = function () {
         _classCallCheck(this, Super);
 
         this.event = {};
+        this.eventOne = {};
     }
 
     // 订阅
@@ -25,6 +26,16 @@ var Super = function () {
             obj.push(fn);
         }
 
+        // 单次订阅
+
+    }, {
+        key: "one",
+        value: function one(str, fn) {
+            if (str) {
+                this.eventOne[str] = fn;
+            }
+        }
+
         // 取消订阅
 
     }, {
@@ -39,8 +50,10 @@ var Super = function () {
                         obj.length = 0;
                     }
                 }
+                delete this.eventOne[str]; // 取消单次订阅
             } else {
                 this.event = {};
+                this.eventOne = {}; // 取消全部单次订阅
             }
         }
 
@@ -54,6 +67,12 @@ var Super = function () {
                 obj.forEach(function (fn) {
                     fn(data);
                 });
+            }
+            // 发布单次订阅并销毁
+            var one = this.eventOne[str];
+            if (one) {
+                one(data);
+                delete this.eventOne[str];
             }
         }
     }]);

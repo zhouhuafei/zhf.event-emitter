@@ -1,6 +1,7 @@
 class Super {
     constructor() {
         this.event = {};
+        this.eventOne = {};
     }
 
     // 订阅
@@ -11,6 +12,13 @@ class Super {
             this.event[str] = obj;
         }
         obj.push(fn);
+    }
+
+    // 单次订阅
+    one(str, fn) {
+        if (str) {
+            this.eventOne[str] = fn;
+        }
     }
 
     // 取消订阅
@@ -24,8 +32,10 @@ class Super {
                     obj.length = 0;
                 }
             }
+            delete this.eventOne[str]; // 取消单次订阅
         } else {
             this.event = {};
+            this.eventOne = {}; // 取消全部单次订阅
         }
     }
 
@@ -36,6 +46,12 @@ class Super {
             obj.forEach((fn) => {
                 fn(data);
             });
+        }
+        // 发布单次订阅并销毁
+        const one = this.eventOne[str];
+        if (one) {
+            one(data);
+            delete this.eventOne[str];
         }
     }
 }
