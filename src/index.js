@@ -13,6 +13,22 @@ class Super {
         obj.push(fn);
     }
 
+    // 取消订阅
+    off(str, num) {
+        if (str) {
+            const obj = this.event[str];
+            if (obj) {
+                if (num && num >= 1) {
+                    obj.splice((num - 1), 1);
+                } else {
+                    obj.length = 0;
+                }
+            }
+        } else {
+            this.event = {};
+        }
+    }
+
     // 发布
     emit(str, data) {
         const obj = this.event[str];

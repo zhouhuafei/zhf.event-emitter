@@ -25,6 +25,25 @@ var Super = function () {
             obj.push(fn);
         }
 
+        // 取消订阅
+
+    }, {
+        key: "off",
+        value: function off(str, num) {
+            if (str) {
+                var obj = this.event[str];
+                if (obj) {
+                    if (num && num >= 1) {
+                        obj.splice(num - 1, 1);
+                    } else {
+                        obj.length = 0;
+                    }
+                }
+            } else {
+                this.event = {};
+            }
+        }
+
         // 发布
 
     }, {

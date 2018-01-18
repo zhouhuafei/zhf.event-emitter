@@ -1,23 +1,60 @@
 const event = require('../dist/index.min');
 
-test(
-    `
-    // 订阅
-    event.on('hehe', function (data) {
-        console.log(data); // {a: 1, b: 2}
+test('订阅发布测试', () => {
+    const dogData = {name: 'dog'};
+    const catData = {name: 'cat'};
+    const result = [];
+
+    // cat的第1次订阅
+    event.on('cat', (data) => {
+        result.push(['cat的第1次订阅', data]);
     });
-    // 发布
-    event.emit('hehe', {a: 1, b: 2});
-    `
-    ,
-    () => {
-        const emitData = {a: 1, b: 2};
-        // 订阅
-        event.on('hehe', (data) => {
-            console.log(data);
-            expect(data).toEqual(emitData);
-        });
-        // 发布
-        event.emit('hehe', emitData);
-    }
-);
+
+    // dog的第1次订阅
+    event.on('dog', (data) => {
+        result.push(['dog的第1次订阅', data]);
+    });
+
+    // dog的第2次订阅
+    event.on('dog', (data) => {
+        result.push(['dog的第2次订阅', data]);
+    });
+
+    // dog的第3次订阅
+    event.on('dog', (data) => {
+        result.push(['dog的第3次订阅', data]);
+    });
+
+    // dog的发布
+    event.emit('dog', dogData);
+
+    // cat的发布
+    event.emit('cat', catData);
+
+    // 取消dog的第2次订阅
+    event.off('dog', 2);
+
+    // dog的发布
+    event.emit('dog', dogData);
+
+    // 取消dog的全部订阅
+    event.off('dog');
+
+    // 取消dog和cat全部订阅
+    event.off();
+
+    // dog的发布
+    event.emit('dog', dogData);
+
+    // cat的发布
+    event.emit('cat', catData);
+
+    expect(result).toEqual([
+        ['dog的第1次订阅', {name: 'dog'}],
+        ['dog的第2次订阅', {name: 'dog'}],
+        ['dog的第3次订阅', {name: 'dog'}],
+        ['cat的第1次订阅', {name: 'cat'}],
+        ['dog的第1次订阅', {name: 'dog'}],
+        ['dog的第3次订阅', {name: 'dog'}],
+    ]);
+});
