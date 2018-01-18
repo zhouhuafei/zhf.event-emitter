@@ -1,5 +1,7 @@
 # 事件发布/订阅模式
 ```
+const event = require('zhf.event');
+
 const dogData = {name: 'dog'};
 const catData = {name: 'cat'};
 const pigData = {name: 'pig'};
