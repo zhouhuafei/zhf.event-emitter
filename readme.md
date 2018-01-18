@@ -1,7 +1,5 @@
 # 事件发布/订阅模式
 ```
-const event = require('zhf.event');
-
 const dogData = {name: 'dog'};
 const catData = {name: 'cat'};
 const pigData = {name: 'pig'};
@@ -78,6 +76,21 @@ event.emit('pig', pigData);
 // pig的发布
 event.emit('pig', pigData);
 
+// minNum的订阅
+event.on('minNum', (data) => {
+    result.push(['minNum的测试', data]);
+}, 2); // 至少要发布(emit)两次,订阅者(on)才会收到消息
+
+// minNum的第1次发布 - 订阅者(on)收不到消息
+event.emit('minNum', {name: 'minNum'}, function (data) {
+    console.log(data); // { triggerNum: 1, minNum: 2 }
+});
+
+// minNum的第2次发布 - 订阅者(on)能收到消息
+event.emit('minNum', {name: 'minNum'}, function (data) {
+    console.log(data); // { triggerNum: 2, minNum: 2 }
+});
+
 // result
 /*
 [
@@ -89,6 +102,7 @@ event.emit('pig', pigData);
     ['dog的第3次订阅', {name: 'dog'}],
     ['pig的单次订阅1', {name: 'pig'}],
     ['pig的单次订阅3', {name: 'pig'}],
+    ['minNum的测试', {name: 'minNum'}],
 ]
 */
 ```

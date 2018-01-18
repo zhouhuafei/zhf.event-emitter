@@ -77,6 +77,21 @@ test('订阅发布测试', () => {
     // pig的发布
     event.emit('pig', pigData);
 
+    // minNum的订阅
+    event.on('minNum', (data) => {
+        result.push(['minNum的测试', data]);
+    }, 2); // 至少要发布(emit)两次,订阅者(on)才会收到消息
+
+    // minNum的第1次发布 - 订阅者(on)收不到消息
+    event.emit('minNum', {name: 'minNum'}, function (data) {
+        console.log(data); // { triggerNum: 1, minNum: 2 }
+    });
+
+    // minNum的第2次发布 - 订阅者(on)能收到消息
+    event.emit('minNum', {name: 'minNum'}, function (data) {
+        console.log(data); // { triggerNum: 2, minNum: 2 }
+    });
+
     expect(result).toEqual([
         ['dog的第1次订阅', {name: 'dog'}],
         ['dog的第2次订阅', {name: 'dog'}],
@@ -86,5 +101,6 @@ test('订阅发布测试', () => {
         ['dog的第3次订阅', {name: 'dog'}],
         ['pig的单次订阅1', {name: 'pig'}],
         ['pig的单次订阅3', {name: 'pig'}],
+        ['minNum的测试', {name: 'minNum'}],
     ]);
 });

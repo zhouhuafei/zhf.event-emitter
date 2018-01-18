@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
@@ -13,17 +13,22 @@ var Super = function () {
     }
 
     _createClass(Super, [{
-        key: "_bind",
-        value: function _bind(str, fn, event) {
+        key: '_bind',
+        value: function _bind(str, fn) {
+            var minNum = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 1;
+            var event = arguments[3];
+
             var obj = event[str];
             if (!obj) {
                 obj = [];
                 event[str] = obj;
             }
+            fn.triggerNum = 0;
+            fn.minNum = minNum;
             obj.push(fn);
         }
     }, {
-        key: "_cancel",
+        key: '_cancel',
         value: function _cancel(str, num, event) {
             var obj = event[str];
             if (obj) {
@@ -35,21 +40,30 @@ var Super = function () {
             }
         }
     }, {
-        key: "_cancelAll",
+        key: '_cancelAll',
         value: function _cancelAll(event) {
             Object.keys(event).forEach(function (key) {
                 event[key].length = 0;
             });
         }
     }, {
-        key: "_trigger",
-        value: function _trigger(str, data, event) {
-            var isDestroy = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : false;
+        key: '_trigger',
+        value: function _trigger(str, data, cb, event) {
+            var isDestroy = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : false;
 
             var obj = event[str];
             if (obj) {
                 obj.forEach(function (fn) {
-                    fn(data);
+                    fn.triggerNum++;
+                    if (fn.triggerNum >= fn.minNum) {
+                        fn(data);
+                    }
+                    if (Object.prototype.toString.call(cb).slice(8, -1).toLowerCase() === 'function') {
+                        cb({
+                            triggerNum: fn.triggerNum,
+                            minNum: fn.minNum
+                        });
+                    }
                 });
                 if (isDestroy) {
                     obj.length = 0;
@@ -57,26 +71,26 @@ var Super = function () {
             }
         }
 
-        // 订阅
+        // 订阅  minNum - 至少发布多少次才会发消息给订阅者
 
     }, {
-        key: "on",
-        value: function on(str, fn) {
-            this._bind(str, fn, this.event);
+        key: 'on',
+        value: function on(str, fn, minNum) {
+            this._bind(str, fn, minNum, this.event);
         }
 
-        // 单次订阅
+        // 单次订阅 - 基于发布完毕就销毁的特性,无法做minNum的功能
 
     }, {
-        key: "one",
+        key: 'one',
         value: function one(str, fn) {
-            this._bind(str, fn, this.eventOne);
+            this._bind(str, fn, 1, this.eventOne);
         }
 
         // 取消订阅
 
     }, {
-        key: "off",
+        key: 'off',
         value: function off(str, num) {
             if (str) {
                 this._cancel(str, num, this.event);
@@ -90,10 +104,10 @@ var Super = function () {
         // 发布
 
     }, {
-        key: "emit",
-        value: function emit(str, data) {
-            this._trigger(str, data, this.event);
-            this._trigger(str, data, this.eventOne, true); // 发布单次订阅并销毁
+        key: 'emit',
+        value: function emit(str, data, cb) {
+            this._trigger(str, data, cb, this.event);
+            this._trigger(str, data, cb, this.eventOne, true); // 发布单次订阅并销毁
         }
     }]);
 

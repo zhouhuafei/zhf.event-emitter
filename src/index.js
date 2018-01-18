@@ -4,12 +4,14 @@ class Super {
         this.eventOne = {};
     }
 
-    _bind(str, fn, event) {
+    _bind(str, fn, minNum = 1, event) {
         let obj = event[str];
         if (!obj) {
             obj = [];
             event[str] = obj;
         }
+        fn.triggerNum = 0;
+        fn.minNum = minNum;
         obj.push(fn);
     }
 
@@ -31,11 +33,20 @@ class Super {
         });
     }
 
-    _trigger(str, data, event, isDestroy = false) {
+    _trigger(str, data, cb, event, isDestroy = false) {
         const obj = event[str];
         if (obj) {
             obj.forEach((fn) => {
-                fn(data);
+                fn.triggerNum++;
+                if (fn.triggerNum >= fn.minNum) {
+                    fn(data);
+                }
+                if (Object.prototype.toString.call(cb).slice(8, -1).toLowerCase() === 'function') {
+                    cb({
+                        triggerNum: fn.triggerNum,
+                        minNum: fn.minNum
+                    });
+                }
             });
             if (isDestroy) {
                 obj.length = 0;
@@ -43,14 +54,14 @@ class Super {
         }
     }
 
-    // 订阅
-    on(str, fn) {
-        this._bind(str, fn, this.event);
+    // 订阅  minNum - 至少发布多少次才会发消息给订阅者
+    on(str, fn, minNum) {
+        this._bind(str, fn, minNum, this.event);
     }
 
-    // 单次订阅
+    // 单次订阅 - 基于发布完毕就销毁的特性,无法做minNum的功能
     one(str, fn) {
-        this._bind(str, fn, this.eventOne);
+        this._bind(str, fn, 1, this.eventOne);
     }
 
     // 取消订阅
@@ -65,9 +76,9 @@ class Super {
     }
 
     // 发布
-    emit(str, data) {
-        this._trigger(str, data, this.event);
-        this._trigger(str, data, this.eventOne, true); // 发布单次订阅并销毁
+    emit(str, data, cb) {
+        this._trigger(str, data, cb, this.event);
+        this._trigger(str, data, cb, this.eventOne, true); // 发布单次订阅并销毁
     }
 }
 
