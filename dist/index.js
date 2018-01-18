@@ -23,9 +23,11 @@ var Super = function () {
                 obj = [];
                 event[str] = obj;
             }
-            fn.triggerNum = 0;
-            fn.minNum = minNum;
-            obj.push(fn);
+            obj.push({
+                minNum: minNum,
+                triggerNum: 0,
+                fn: fn
+            });
         }
     }, {
         key: '_cancel',
@@ -33,7 +35,9 @@ var Super = function () {
             var obj = event[str];
             if (obj) {
                 if (num && num >= 1) {
-                    obj.splice(num - 1, 1, function () {});
+                    obj.splice(num - 1, 1, {
+                        fn: function fn() {}
+                    });
                 } else {
                     obj.length = 0;
                 }
@@ -53,16 +57,13 @@ var Super = function () {
 
             var obj = event[str];
             if (obj) {
-                obj.forEach(function (fn) {
-                    fn.triggerNum++;
-                    if (fn.triggerNum >= fn.minNum) {
-                        fn(data);
+                obj.forEach(function (json) {
+                    json.triggerNum++;
+                    if (json.triggerNum >= json.minNum) {
+                        json.fn(data);
                     }
                     if (Object.prototype.toString.call(cb).slice(8, -1).toLowerCase() === 'function') {
-                        cb({
-                            triggerNum: fn.triggerNum,
-                            minNum: fn.minNum
-                        });
+                        cb(json);
                     }
                 });
                 if (isDestroy) {

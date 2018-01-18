@@ -10,16 +10,20 @@ class Super {
             obj = [];
             event[str] = obj;
         }
-        fn.triggerNum = 0;
-        fn.minNum = minNum;
-        obj.push(fn);
+        obj.push({
+            minNum: minNum,
+            triggerNum: 0,
+            fn: fn,
+        });
     }
 
     _cancel(str, num, event) {
         const obj = event[str];
         if (obj) {
             if (num && num >= 1) {
-                obj.splice((num - 1), 1, function () {
+                obj.splice((num - 1), 1, {
+                    fn: function () {
+                    },
                 });
             } else {
                 obj.length = 0;
@@ -36,16 +40,13 @@ class Super {
     _trigger(str, data, cb, event, isDestroy = false) {
         const obj = event[str];
         if (obj) {
-            obj.forEach((fn) => {
-                fn.triggerNum++;
-                if (fn.triggerNum >= fn.minNum) {
-                    fn(data);
+            obj.forEach((json) => {
+                json.triggerNum++;
+                if (json.triggerNum >= json.minNum) {
+                    json.fn(data);
                 }
                 if (Object.prototype.toString.call(cb).slice(8, -1).toLowerCase() === 'function') {
-                    cb({
-                        triggerNum: fn.triggerNum,
-                        minNum: fn.minNum
-                    });
+                    cb(json);
                 }
             });
             if (isDestroy) {
