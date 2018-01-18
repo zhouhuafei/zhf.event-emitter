@@ -51,9 +51,14 @@ event.emit('dog', dogData);
 // cat的发布
 event.emit('cat', catData);
 
-// pig的单次订阅
+// pig的单次订阅1
 event.one('pig', (data) => {
-    result.push(['pig的单次订阅', data]);
+    result.push(['pig的单次订阅1', data]);
+});
+
+// pig的单次订阅2
+event.one('pig', (data) => {
+    result.push(['pig的单次订阅2', data]);
 });
 
 // pig的发布
@@ -71,7 +76,8 @@ event.emit('pig', pigData);
     ['cat的第1次订阅', {name: 'cat'}],
     ['dog的第1次订阅', {name: 'dog'}],
     ['dog的第3次订阅', {name: 'dog'}],
-    ['pig的单次订阅', {name: 'pig'}],
+    ['pig的单次订阅1', {name: 'pig'}],
+    ['pig的单次订阅2', {name: 'pig'}],
 ]
 */
 ```

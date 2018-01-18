@@ -12,18 +12,57 @@ var Super = function () {
         this.eventOne = {};
     }
 
-    // 订阅
-
-
     _createClass(Super, [{
-        key: "on",
-        value: function on(str, fn) {
-            var obj = this.event[str];
+        key: "_bind",
+        value: function _bind(str, fn, event) {
+            var obj = event[str];
             if (!obj) {
                 obj = [];
-                this.event[str] = obj;
+                event[str] = obj;
             }
             obj.push(fn);
+        }
+    }, {
+        key: "_cancel",
+        value: function _cancel(str, num, event) {
+            var obj = event[str];
+            if (obj) {
+                if (num && num >= 1) {
+                    obj.splice(num - 1, 1, function () {});
+                } else {
+                    obj.length = 0;
+                }
+            }
+        }
+    }, {
+        key: "_cancelAll",
+        value: function _cancelAll(event) {
+            Object.keys(event).forEach(function (key) {
+                event[key].length = 0;
+            });
+        }
+    }, {
+        key: "_trigger",
+        value: function _trigger(str, data, event) {
+            var isDestroy = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : false;
+
+            var obj = event[str];
+            if (obj) {
+                obj.forEach(function (fn) {
+                    fn(data);
+                });
+                if (isDestroy) {
+                    obj.length = 0;
+                }
+            }
+        }
+
+        // 订阅
+
+    }, {
+        key: "on",
+        value: function on(str, fn) {
+            this._bind(str, fn, this.event);
         }
 
         // 单次订阅
@@ -31,9 +70,7 @@ var Super = function () {
     }, {
         key: "one",
         value: function one(str, fn) {
-            if (str) {
-                this.eventOne[str] = fn;
-            }
+            this._bind(str, fn, this.eventOne);
         }
 
         // 取消订阅
@@ -42,18 +79,11 @@ var Super = function () {
         key: "off",
         value: function off(str, num) {
             if (str) {
-                var obj = this.event[str];
-                if (obj) {
-                    if (num && num >= 1) {
-                        obj.splice(num - 1, 1);
-                    } else {
-                        obj.length = 0;
-                    }
-                }
-                delete this.eventOne[str]; // 取消单次订阅
+                this._cancel(str, num, this.event);
+                this._cancel(str, num, this.eventOne); // 取消单次订阅
             } else {
-                this.event = {};
-                this.eventOne = {}; // 取消全部单次订阅
+                this._cancelAll(this.event);
+                this._cancelAll(this.eventOne); // 取消全部单次订阅
             }
         }
 
@@ -62,18 +92,8 @@ var Super = function () {
     }, {
         key: "emit",
         value: function emit(str, data) {
-            var obj = this.event[str];
-            if (obj) {
-                obj.forEach(function (fn) {
-                    fn(data);
-                });
-            }
-            // 发布单次订阅并销毁
-            var one = this.eventOne[str];
-            if (one) {
-                one(data);
-                delete this.eventOne[str];
-            }
+            this._trigger(str, data, this.event);
+            this._trigger(str, data, this.eventOne, true); // 发布单次订阅并销毁
         }
     }]);
 
