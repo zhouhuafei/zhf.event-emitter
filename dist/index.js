@@ -54,9 +54,7 @@ var Super = function () {
         }
     }, {
         key: '_trigger',
-        value: function _trigger(str, data, cb, event) {
-            var isDestroy = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : false;
-
+        value: function _trigger(str, data, cb, event, type) {
             var obj = event[str];
             if (obj) {
                 if (!obj.allData) {
@@ -67,7 +65,8 @@ var Super = function () {
                     json.triggerNum++;
                     if (json.triggerNum >= json.minNum && json.isDel === false) {
                         json.fn({ nowData: data, allData: obj.allData });
-                        if (isDestroy) {
+                        // 销毁发布过的单次订阅
+                        if (type === 'one') {
                             json.isDel = true;
                             json.fn = function () {};
                         }
@@ -77,7 +76,8 @@ var Super = function () {
                         cb(json);
                     }
                 });
-                if (isDestroy) {
+                // 销毁全部单次订阅
+                if (type === 'one') {
                     var isDelAll = true;
                     obj.forEach(function (json) {
                         if (json.isDel === false) {
@@ -127,7 +127,7 @@ var Super = function () {
         key: 'emit',
         value: function emit(str, data, cb) {
             this._trigger(str, data, cb, this.event);
-            this._trigger(str, data, cb, this.eventOne, true); // 发布单次订阅并销毁
+            this._trigger(str, data, cb, this.eventOne, 'one'); // 发布单次订阅并销毁
         }
 
         // 数组转对象

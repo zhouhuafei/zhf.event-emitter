@@ -39,7 +39,7 @@ class Super {
         });
     }
 
-    _trigger(str, data, cb, event, isDestroy = false) {
+    _trigger(str, data, cb, event, type) {
         const obj = event[str];
         if (obj) {
             if (!obj.allData) {
@@ -50,7 +50,8 @@ class Super {
                 json.triggerNum++;
                 if (json.triggerNum >= json.minNum && json.isDel === false) {
                     json.fn({nowData: data, allData: obj.allData});
-                    if (isDestroy) {
+                    // 销毁发布过的单次订阅
+                    if (type === 'one') {
                         json.isDel = true;
                         json.fn = function () {
                         };
@@ -61,7 +62,8 @@ class Super {
                     cb(json);
                 }
             });
-            if (isDestroy) {
+            // 销毁全部单次订阅
+            if (type === 'one') {
                 let isDelAll = true;
                 obj.forEach((json) => {
                     if (json.isDel === false) {
@@ -99,7 +101,7 @@ class Super {
     // 发布
     emit(str, data, cb) {
         this._trigger(str, data, cb, this.event);
-        this._trigger(str, data, cb, this.eventOne, true); // 发布单次订阅并销毁
+        this._trigger(str, data, cb, this.eventOne, 'one'); // 发布单次订阅并销毁
     }
 
     // 数组转对象
