@@ -11,6 +11,7 @@ class Super {
             event[str] = obj;
         }
         obj.push({
+            isDel: false,
             minNum: minNum,
             triggerNum: 0,
             fn: fn,
@@ -22,6 +23,7 @@ class Super {
         if (obj) {
             if (num && num >= 1) {
                 obj.splice((num - 1), 1, {
+                    isDel: true,
                     fn: function () {
                     },
                 });
@@ -42,8 +44,13 @@ class Super {
         if (obj) {
             obj.forEach((json) => {
                 json.triggerNum++;
-                if (json.triggerNum >= json.minNum) {
+                if (json.triggerNum >= json.minNum && json.isDel === false) {
                     json.fn(data);
+                    if (isDestroy) {
+                        json.isDel = true;
+                        json.fn = function () {
+                        };
+                    }
                 }
                 if (Object.prototype.toString.call(cb).slice(8, -1).toLowerCase() === 'function') {
                     json.data = data;
@@ -51,19 +58,27 @@ class Super {
                 }
             });
             if (isDestroy) {
-                obj.length = 0;
+                let isDelAll = true;
+                obj.forEach((json) => {
+                    if (json.isDel === false) {
+                        isDelAll = false;
+                    }
+                });
+                if (isDelAll) {
+                    obj.length = 0;
+                }
             }
         }
     }
 
-    // 订阅  minNum - 至少发布多少次才会发消息给订阅者
+    // 订阅 minNum - 至少发布(emit)多少次才会发消息(on)给订阅者
     on(str, fn, minNum) {
         this._bind(str, fn, minNum, this.event);
     }
 
-    // 单次订阅 - 基于发布完毕就销毁的特性,无法做minNum的功能
-    one(str, fn) {
-        this._bind(str, fn, 1, this.eventOne);
+    // 单次订阅 minNum - 至少发布(emit)多少次才会发消息(on)给订阅者
+    one(str, fn, minNum) {
+        this._bind(str, fn, minNum, this.eventOne);
     }
 
     // 取消订阅

@@ -24,6 +24,7 @@ var Super = function () {
                 event[str] = obj;
             }
             obj.push({
+                isDel: false,
                 minNum: minNum,
                 triggerNum: 0,
                 fn: fn
@@ -36,6 +37,7 @@ var Super = function () {
             if (obj) {
                 if (num && num >= 1) {
                     obj.splice(num - 1, 1, {
+                        isDel: true,
                         fn: function fn() {}
                     });
                 } else {
@@ -59,8 +61,12 @@ var Super = function () {
             if (obj) {
                 obj.forEach(function (json) {
                     json.triggerNum++;
-                    if (json.triggerNum >= json.minNum) {
+                    if (json.triggerNum >= json.minNum && json.isDel === false) {
                         json.fn(data);
+                        if (isDestroy) {
+                            json.isDel = true;
+                            json.fn = function () {};
+                        }
                     }
                     if (Object.prototype.toString.call(cb).slice(8, -1).toLowerCase() === 'function') {
                         json.data = data;
@@ -68,12 +74,20 @@ var Super = function () {
                     }
                 });
                 if (isDestroy) {
-                    obj.length = 0;
+                    var isDelAll = true;
+                    obj.forEach(function (json) {
+                        if (json.isDel === false) {
+                            isDelAll = false;
+                        }
+                    });
+                    if (isDelAll) {
+                        obj.length = 0;
+                    }
                 }
             }
         }
 
-        // 订阅  minNum - 至少发布多少次才会发消息给订阅者
+        // 订阅 minNum - 至少发布(emit)多少次才会发消息(on)给订阅者
 
     }, {
         key: 'on',
@@ -81,12 +95,12 @@ var Super = function () {
             this._bind(str, fn, minNum, this.event);
         }
 
-        // 单次订阅 - 基于发布完毕就销毁的特性,无法做minNum的功能
+        // 单次订阅 minNum - 至少发布(emit)多少次才会发消息(on)给订阅者
 
     }, {
         key: 'one',
-        value: function one(str, fn) {
-            this._bind(str, fn, 1, this.eventOne);
+        value: function one(str, fn, minNum) {
+            this._bind(str, fn, minNum, this.eventOne);
         }
 
         // 取消订阅
