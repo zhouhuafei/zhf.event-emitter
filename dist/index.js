@@ -59,10 +59,14 @@ var Super = function () {
 
             var obj = event[str];
             if (obj) {
+                if (!obj.allData) {
+                    obj.allData = [];
+                }
+                obj.allData.push(data);
                 obj.forEach(function (json) {
                     json.triggerNum++;
                     if (json.triggerNum >= json.minNum && json.isDel === false) {
-                        json.fn(data);
+                        json.fn({ nowData: data, allData: obj.allData });
                         if (isDestroy) {
                             json.isDel = true;
                             json.fn = function () {};
@@ -124,6 +128,22 @@ var Super = function () {
         value: function emit(str, data, cb) {
             this._trigger(str, data, cb, this.event);
             this._trigger(str, data, cb, this.eventOne, true); // 发布单次订阅并销毁
+        }
+
+        // 数组转对象
+
+    }, {
+        key: 'arrToJson',
+        value: function arrToJson(arr) {
+            var json = {};
+            arr.forEach(function (v, i) {
+                if (v.name) {
+                    json[v.name] = v;
+                } else {
+                    json[i] = v;
+                }
+            });
+            return json;
         }
     }]);
 
