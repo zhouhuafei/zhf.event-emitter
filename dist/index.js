@@ -66,7 +66,7 @@ var Super = function () {
                     if (json.triggerNum >= json.minNum && json.isDel === false) {
                         json.fn({ nowData: data, allData: obj.allData });
                         // 销毁发布过的单次订阅
-                        if (type === 'one') {
+                        if (type === 'once') {
                             json.isDel = true;
                             json.fn = function () {};
                         }
@@ -77,7 +77,7 @@ var Super = function () {
                     }
                 });
                 // 销毁全部单次订阅
-                if (type === 'one') {
+                if (type === 'once') {
                     var isDelAll = true;
                     obj.forEach(function (json) {
                         if (json.isDel === false) {
@@ -102,8 +102,8 @@ var Super = function () {
         // 单次订阅 minNum - 至少发布(emit)多少次才会发消息(on)给订阅者
 
     }, {
-        key: 'one',
-        value: function one(str, fn, minNum) {
+        key: 'once',
+        value: function once(str, fn, minNum) {
             this._bind(str, fn, minNum, this.eventOne);
         }
 
@@ -127,7 +127,7 @@ var Super = function () {
         key: 'emit',
         value: function emit(str, data, cb) {
             this._trigger(str, data, cb, this.event);
-            this._trigger(str, data, cb, this.eventOne, 'one'); // 发布单次订阅并销毁
+            this._trigger(str, data, cb, this.eventOne, 'once'); // 发布单次订阅并销毁
         }
 
         // 数组转对象
@@ -150,4 +150,4 @@ var Super = function () {
     return Super;
 }();
 
-module.exports = new Super();
+module.exports = Super;

@@ -1,6 +1,8 @@
-const event = require('../dist/index.min');
+const EventEmitter = require('../dist/index.min');
 
 test('订阅发布测试', () => {
+    const event = new EventEmitter();
+
     const dogData = {name: 'dog'};
     const catData = {name: 'cat'};
     const pigData = {name: 'pig'};
@@ -54,17 +56,17 @@ test('订阅发布测试', () => {
     event.emit('cat', catData);
 
     // pig的单次订阅1
-    event.one('pig', (data) => {
+    event.once('pig', (data) => {
         result.push(['pig的单次订阅1', data.nowData]);
     });
 
     // pig的单次订阅2
-    event.one('pig', (data) => {
+    event.once('pig', (data) => {
         result.push(['pig的单次订阅2', data.nowData]);
     });
 
     // pig的单次订阅3
-    event.one('pig', (data) => {
+    event.once('pig', (data) => {
         result.push(['pig的单次订阅3', data.nowData]);
     });
 
@@ -78,7 +80,7 @@ test('订阅发布测试', () => {
     event.emit('pig', pigData);
 
     // minNum的订阅
-    event.one('minNum', (data) => {
+    event.once('minNum', (data) => {
         result.push(['minNum的测试', data.nowData]);
         console.log(event.arrToJson(data.allData)); // {minNumName1: {name: 'minNumName1'}, minNumName2: {name: 'minNumName2'}}
     }, 2); // 至少要发布(emit)两次,订阅者(on)才会收到消息
@@ -93,7 +95,7 @@ test('订阅发布测试', () => {
         console.log(data); // {isDel: true, minNum: 2, triggerNum: 2, fn: [Function], data: {name: 'minNumName2'}}
     });
 
-    // minNum的第3次发布 - 订阅者(on)收不到消息,因为订阅者收到消息后就取消了订阅,这是one方法的特性
+    // minNum的第3次发布 - 订阅者(on)收不到消息,因为订阅者收到消息后就取消了订阅,这是once方法的特性
     event.emit('minNum', {name: 'minNumName3'}, (data) => {
         console.log(data); // 不会执行
     });

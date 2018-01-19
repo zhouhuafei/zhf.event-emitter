@@ -51,7 +51,7 @@ class Super {
                 if (json.triggerNum >= json.minNum && json.isDel === false) {
                     json.fn({nowData: data, allData: obj.allData});
                     // 销毁发布过的单次订阅
-                    if (type === 'one') {
+                    if (type === 'once') {
                         json.isDel = true;
                         json.fn = function () {
                         };
@@ -63,7 +63,7 @@ class Super {
                 }
             });
             // 销毁全部单次订阅
-            if (type === 'one') {
+            if (type === 'once') {
                 let isDelAll = true;
                 obj.forEach((json) => {
                     if (json.isDel === false) {
@@ -83,7 +83,7 @@ class Super {
     }
 
     // 单次订阅 minNum - 至少发布(emit)多少次才会发消息(on)给订阅者
-    one(str, fn, minNum) {
+    once(str, fn, minNum) {
         this._bind(str, fn, minNum, this.eventOne);
     }
 
@@ -101,7 +101,7 @@ class Super {
     // 发布
     emit(str, data, cb) {
         this._trigger(str, data, cb, this.event);
-        this._trigger(str, data, cb, this.eventOne, 'one'); // 发布单次订阅并销毁
+        this._trigger(str, data, cb, this.eventOne, 'once'); // 发布单次订阅并销毁
     }
 
     // 数组转对象
@@ -118,4 +118,4 @@ class Super {
     }
 }
 
-module.exports = new Super();
+module.exports = Super;
