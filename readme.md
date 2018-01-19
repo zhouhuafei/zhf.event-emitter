@@ -110,7 +110,7 @@ event.emit('minNum', {name: 'minNumName3'}, (data) => {
     ['dog的第3次订阅', {name: 'dog'}],
     ['pig的单次订阅1', {name: 'pig'}],
     ['pig的单次订阅3', {name: 'pig'}],
-    ['minNum的测试', {name: 'minNum'}],
+    ['minNum的测试', {name: 'minNumName2'}],
 ]
 */
 ```
