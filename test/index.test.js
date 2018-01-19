@@ -84,17 +84,17 @@ test('订阅发布测试', () => {
     }, 2); // 至少要发布(emit)两次,订阅者(on)才会收到消息
 
     // minNum的第1次发布 - 订阅者(on)收不到消息
-    event.emit('minNum', {name: 'minNumName1'}, function (data) {
+    event.emit('minNum', {name: 'minNumName1'}, (data) => {
         console.log(data); // {isDel: false, minNum: 2, triggerNum: 1, fn: [Function], data: {name: 'minNumName1'}}
     });
 
     // minNum的第2次发布 - 订阅者(on)能收到消息
-    event.emit('minNum', {name: 'minNumName2'}, function (data) {
+    event.emit('minNum', {name: 'minNumName2'}, (data) => {
         console.log(data); // {isDel: true, minNum: 2, triggerNum: 2, fn: [Function], data: {name: 'minNumName2'}}
     });
 
     // minNum的第3次发布 - 订阅者(on)收不到消息,因为订阅者收到消息后就取消了订阅,这是one方法的特性
-    event.emit('minNum', {name: 'minNumName3'}, function (data) {
+    event.emit('minNum', {name: 'minNumName3'}, (data) => {
         console.log(data); // 不会执行
     });
 
