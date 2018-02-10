@@ -1,6 +1,6 @@
 # 事件发布/订阅模式
 ```
-const EventEmitter = require('zhf.event');
+const EventEmitter = require('zhf.event-emitter');
 
 const event = new EventEmitter();
 

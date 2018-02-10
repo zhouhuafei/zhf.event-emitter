@@ -1,6 +1,6 @@
 {
-    "name": "zhf.event",
-    "version": "2.0.0",
+    "name": "zhf.event-emitter",
+    "version": "1.0.0",
     "description": "no description",
     "main": "dist/index.min.js",
     "scripts": {
@@ -11,14 +11,14 @@
     },
     "repository": {
         "type": "git",
-        "url": "git+https://github.com/zhouhuafei/zhf.event.git"
+        "url": "git+https://github.com/zhouhuafei/zhf.event-emitter.git"
     },
     "author": "",
     "license": "ISC",
     "bugs": {
-        "url": "https://github.com/zhouhuafei/zhf.event/issues"
+        "url": "https://github.com/zhouhuafei/zhf.event-emitter/issues"
     },
-    "homepage": "https://github.com/zhouhuafei/zhf.event#readme",
+    "homepage": "https://github.com/zhouhuafei/zhf.event-emitter#readme",
     "devDependencies": {
         "babel-eslint": "^8.0.2",
         "babel-preset-env": "^1.6.0",
