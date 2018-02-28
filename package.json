@@ -1,6 +1,6 @@
 {
     "name": "zhf.event-emitter",
-    "version": "1.0.1",
+    "version": "1.0.2",
     "description": "no description",
     "main": "dist/index.min.js",
     "scripts": {

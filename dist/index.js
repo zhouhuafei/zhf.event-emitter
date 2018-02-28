@@ -15,7 +15,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         define(factory);
     } else if (window) {
         // window - browser canon
-        if (Object.prototype.toString.call(window.zhf).slice(8, -1).toLowerCase() !== 'Object') {
+        if (Object.prototype.toString.call(window.zhf).slice(8, -1).toLowerCase() !== 'object') {
             window.zhf = {};
         }
         window.zhf[name] = factory();
