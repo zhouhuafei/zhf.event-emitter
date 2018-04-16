@@ -128,14 +128,17 @@ const result = [];
 
 function test1(data) {
     // console.log('订阅发布测试2-addEventListener订阅-test1\n', data);
+    result.push(data.nowData);
 }
 
 function test2(data) {
     // console.log('订阅发布测试2-addEventListener订阅-test2\n', data);
+    result.push(data.nowData);
 }
 
 event.on('test-addEventListener', function (data) {
     // console.log('订阅发布测试2-on订阅\n', data);
+    result.push(data.nowData);
 });
 event.addEventListener('test-addEventListener', test1);
 event.addEventListener('test-addEventListener', test2);
