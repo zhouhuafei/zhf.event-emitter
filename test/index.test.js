@@ -1,5 +1,4 @@
 const EventEmitter = require('../dist/index.min');
-
 test('订阅发布测试', () => {
     const event = new EventEmitter();
 
@@ -82,22 +81,22 @@ test('订阅发布测试', () => {
     // minNum的订阅
     event.once('minNum', (data) => {
         result.push(['minNum的测试', data.nowData]);
-        console.log(event.arrToJson(data.allData)); // {minNumName1: {name: 'minNumName1'}, minNumName2: {name: 'minNumName2'}}
+        // console.log(event.arrToJson(data.allData)); // {minNumName1: {name: 'minNumName1'}, minNumName2: {name: 'minNumName2'}}
     }, 2); // 至少要发布(emit)两次,订阅者(on)才会收到消息
 
     // minNum的第1次发布 - 订阅者(on)收不到消息
     event.emit('minNum', {name: 'minNumName1'}, (data) => {
-        console.log(data); // {isDel: false, minNum: 2, triggerNum: 1, fn: [Function], data: {name: 'minNumName1'}}
+        // console.log(data); // {isDel: false, minNum: 2, triggerNum: 1, fn: [Function], data: {name: 'minNumName1'}}
     });
 
     // minNum的第2次发布 - 订阅者(on)能收到消息
     event.emit('minNum', {name: 'minNumName2'}, (data) => {
-        console.log(data); // {isDel: true, minNum: 2, triggerNum: 2, fn: [Function], data: {name: 'minNumName2'}}
+        // console.log(data); // {isDel: true, minNum: 2, triggerNum: 2, fn: [Function], data: {name: 'minNumName2'}}
     });
 
     // minNum的第3次发布 - 订阅者(on)收不到消息,因为订阅者收到消息后就取消了订阅,这是once方法的特性
     event.emit('minNum', {name: 'minNumName3'}, (data) => {
-        console.log(data); // 不会执行
+        // console.log(data); // 不会执行
     });
 
     expect(result).toEqual([
@@ -110,5 +109,42 @@ test('订阅发布测试', () => {
         ['pig的单次订阅1', {name: 'pig'}],
         ['pig的单次订阅3', {name: 'pig'}],
         ['minNum的测试', {name: 'minNumName2'}],
+    ]);
+});
+
+test('订阅发布测试2', () => {
+    const event = new EventEmitter();
+    const result = [];
+
+    function test1(data) {
+        // console.log('订阅发布测试2-addEventListener订阅-test1\n', data);
+        result.push(data.nowData);
+    }
+
+    function test2(data) {
+        // console.log('订阅发布测试2-addEventListener订阅-test2\n', data);
+        result.push(data.nowData);
+    }
+
+    event.on('test-addEventListener', function (data) {
+        // console.log('订阅发布测试2-on订阅\n', data);
+        result.push(data.nowData);
+    });
+    event.addEventListener('test-addEventListener', test1);
+    event.addEventListener('test-addEventListener', test2);
+    event.addEventListener('test-addEventListener', test2);
+    event.emit('test-addEventListener', {name: 'addEventListener1'});
+    event.off('test-addEventListener', 1);
+    event.removeEventListener('test-addEventListener', test1, 1);
+    event.removeEventListener('test-addEventListener', test2, 1);
+    // event.off('test-addEventListener', 2, test2); // 和下面一行是同等功能
+    // event.removeEventListener('test-addEventListener', test2, 2); // 和上面一行是同等功能
+    event.emit('test-addEventListener', {name: 'addEventListener2'});
+    expect(result).toEqual([
+        {name: 'addEventListener1'},
+        {name: 'addEventListener1'},
+        {name: 'addEventListener1'},
+        {name: 'addEventListener1'},
+        {name: 'addEventListener2'},
     ]);
 });

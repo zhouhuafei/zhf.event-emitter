@@ -17,32 +17,44 @@
         }
 
         _bind(str, fn, minNum = 1, event) {
-            let obj = event[str];
-            if (!obj) {
-                obj = [];
-                event[str] = obj;
+            let arr = event[str];
+            if (!arr) {
+                arr = [];
+                event[str] = arr;
             }
-            obj.push({
-                isDel: false,
-                minNum: minNum,
-                triggerNum: 0,
-                fn: fn,
+            arr.push({
+                isDel: false, // 是否取消了这个函数的订阅
+                minNum: minNum, // 至少触发几次才会发布订阅
+                triggerNum: 0, // 目前触发了几次
+                fn: fn, // 订阅的函数
             });
         }
 
         _cancel(str, num, event) {
-            const obj = event[str];
-            if (obj) {
+            const arr = event[str];
+            if (arr) {
                 if (num && num >= 1) {
-                    obj.splice((num - 1), 1, {
-                        isDel: true,
-                        fn: function () {
-                        },
-                    });
+                    arr[num - 1].isDel = true;
+                    // 取消了全部
+                    if (this._isCancelAll(arr) === true) {
+                        arr.length = 0;
+                    }
                 } else {
-                    obj.length = 0;
+                    arr.length = 0;
                 }
             }
+        }
+
+        _isCancelAll(arr) {
+            let isCancelAll = true;
+            for (let i = 0; i < arr.length; i++) {
+                const json = arr[i];
+                delete json.fn.nowNum;
+                if (json.isDel === false) {
+                    isCancelAll = false;
+                }
+            }
+            return isCancelAll;
         }
 
         _cancelAll(event) {
@@ -52,21 +64,19 @@
         }
 
         _trigger(str, data, cb, event, type) {
-            const obj = event[str];
-            if (obj) {
-                if (!obj.allData) {
-                    obj.allData = [];
+            const arr = event[str];
+            if (arr) {
+                if (!arr.allData) {
+                    arr.allData = []; // 添加了这个allData属性，以后再循环obj，请使用普通的for循环或者forEach循环，否则这个allData会被遍历出来，造成不必要的麻烦。
                 }
-                obj.allData.push(data);
-                obj.forEach((json) => {
+                arr.allData.push(data);
+                arr.forEach((json) => {
                     json.triggerNum++;
                     if (json.triggerNum >= json.minNum && json.isDel === false) {
-                        json.fn({nowData: data, allData: obj.allData});
+                        json.fn({nowData: data, allData: arr.allData});
                         // 销毁发布过的单次订阅
                         if (type === 'once') {
                             json.isDel = true;
-                            json.fn = function () {
-                            };
                         }
                     }
                     if (Object.prototype.toString.call(cb).slice(8, -1).toLowerCase() === 'function') {
@@ -77,13 +87,13 @@
                 // 销毁全部单次订阅
                 if (type === 'once') {
                     let isDelAll = true;
-                    obj.forEach((json) => {
+                    arr.forEach((json) => {
                         if (json.isDel === false) {
                             isDelAll = false;
                         }
                     });
                     if (isDelAll) {
-                        obj.length = 0;
+                        arr.length = 0;
                     }
                 }
             }
@@ -94,13 +104,55 @@
             this._bind(str, fn, minNum, this.event);
         }
 
+        // 订阅 minNum - 至少发布(emit)多少次才会发消息(on)给订阅者
+        addEventListener(str, fnName, minNum) {
+            this._bind(str, fnName, minNum, this.event);
+        }
+
+        // 取消订阅 取消指定名字 以及指定名字的第几个
+        removeEventListener(str, fnName, num) {
+            const arr = this.event[str];
+            if (arr) {
+                // 这里用普通的for循环或者forEach循环都可以，不会循环出obj上因触发_trigger而绑定的allData属性，否则还需做特殊处理。
+                for (let i = 0; i < arr.length; i++) {
+                    const json = arr[i];
+                    if (json.fn.nowNum === undefined) {
+                        json.fn.nowNum = 0;
+                    }
+                    if (num && num >= 1) {
+                        // 取消指定名字的第几个
+                        if (json.fn === fnName) {
+                            json.fn.nowNum++;
+                            if (json.fn.nowNum === num) {
+                                json.isDel = true;
+                            }
+                        }
+                    } else {
+                        // 取消指定名字的全部，并不代表取消了这个数组里的全部
+                        if (json.fn === fnName) {
+                            json.isDel = true;
+                        }
+                    }
+                }
+                // 取消了全部
+                if (this._isCancelAll(arr) === true) {
+                    arr.length = 0;
+                }
+            }
+        }
+
         // 单次订阅 minNum - 至少发布(emit)多少次才会发消息(on)给订阅者
         once(str, fn, minNum) {
             this._bind(str, fn, minNum, this.eventOne);
         }
 
         // 取消订阅
-        off(str, num) {
+        off(str, num, fnName) {
+            if (fnName !== undefined) {
+                // 给off增加removeEventListener的功能
+                this.removeEventListener(str, fnName, num);
+                return;
+            }
             if (str) {
                 this._cancel(str, num, this.event);
                 this._cancel(str, num, this.eventOne); // 取消单次订阅
