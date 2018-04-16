@@ -95,7 +95,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                     arr.forEach(function (json) {
                         json.triggerNum++;
                         if (json.triggerNum >= json.minNum && json.isDel === false) {
-                            json.fn({ nowData: data, allData: arr.allData });
+                            json.fn({ nowData: data, eventName: str, allData: arr.allData });
                             // 销毁发布过的单次订阅
                             if (type === 'once') {
                                 json.isDel = true;
