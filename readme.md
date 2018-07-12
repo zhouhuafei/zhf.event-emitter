@@ -86,6 +86,7 @@ event.emit('pig', pigData);
 // minNum的订阅
 event.once('minNum', (data) => {
     result.push(['minNum的测试', data.nowData]);
+    // console.log(data); // { nowData: { name: 'minNumName2' }, eventName: 'minNum', allData: [ { name: 'minNumName1' }, { name: 'minNumName2' } ], allDataJson: { minNumName1: { name: 'minNumName1' }, minNumName2: { name: 'minNumName2' } } };
     // console.log(event.arrToJson(data.allData)); // {minNumName1: {name: 'minNumName1'}, minNumName2: {name: 'minNumName2'}}
 }, 2); // 至少要发布(emit)两次,订阅者(on)才会收到消息
 

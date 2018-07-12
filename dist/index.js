@@ -86,6 +86,8 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         }, {
             key: '_trigger',
             value: function _trigger(str, data, cb, event, type) {
+                var _this = this;
+
                 var arr = event[str];
                 if (arr) {
                     if (!arr.allData) {
@@ -95,7 +97,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                     arr.forEach(function (json) {
                         json.triggerNum++;
                         if (json.triggerNum >= json.minNum && json.isDel === false) {
-                            json.fn({ nowData: data, eventName: str, allData: arr.allData });
+                            json.fn({ nowData: data, eventName: str, allData: arr.allData, allDataJson: _this.arrToJson(arr.allData) });
                             // 销毁发布过的单次订阅
                             if (type === 'once') {
                                 json.isDel = true;
